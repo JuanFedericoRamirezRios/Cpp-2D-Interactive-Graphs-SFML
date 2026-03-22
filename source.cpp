@@ -1,8 +1,11 @@
 /*
 Standar C++ 17
+SFML-3.0.2
 */
 
 #include "SFML/Graphics.hpp"
+#include <iostream>
+#include "HERO.h"
 
 using namespace sf;
 
@@ -11,46 +14,65 @@ VideoMode vm(Vector2u((unsigned)viewSize.x, (unsigned)viewSize.y));
 RenderWindow window(vm, "Interactive App", Style::Default); // Default combines the ability to resize a window, close it, and add a title bar.
 
 Texture skyTexture;
-Sprite* skySprite;
+Sprite *skySprite;
 
 Texture bgTexture;
 Sprite* bgSprite;
 
-Texture heroTexture;
-Sprite* heroSprite;
+HERO hero;
+
+Vector2f playerPosition;
+//bool playerMoving = false;
 
 bool IfKeyPressed(std::optional<Event> event, Keyboard::Key keyPress) {
     return (event->is<Event::KeyPressed>() && event->getIf<Event::KeyPressed>()->code == keyPress);
 }
+bool IfKeyReleased(std::optional<Event> event, Keyboard::Key keyRelease) {
+    return (event->is<Event::KeyReleased>() && event->getIf<Event::KeyReleased>()->code == keyRelease);
+}
+void init() {
+    if (!skyTexture.loadFromFile("Assets/graphics/sky.png"))
+        std::cerr << "Warning: No found texture ";
+    skySprite = new Sprite(skyTexture);
 
-void updateInput() {
+    if (!bgTexture.loadFromFile("Assets/graphics/bg.png"))
+        std::cerr << "Warning: No found texture ";
+    bgSprite = new Sprite(bgTexture);
+
+    hero.Init("Assets/graphics/hero.png", Vector2f(viewSize.x * 0.25f, viewSize.y * 0.5f), 200.0f);
     
-    while (std::optional<Event> e = window.pollEvent()) {
-        /*if (e->is<Event::Closed>() || (e->is<Event::KeyPressed>() && e->getIf<Event::KeyPressed>()->code == Keyboard::Key::Escape)) {
-            window.close();
-        }*/
-        if (e->is<Event::Closed>() || IfKeyPressed(e, Keyboard::Key::Escape)) {
+}
+void updateInput() {
+    std::optional<Event> event;
+    while (event = window.pollEvent()) {
+        if (IfKeyPressed(event, Keyboard::Key::Up))
+            hero.Jump(-750.0f);
+        //if (IfKeyPressed(event, Keyboard::Key::Right)) {
+        //    playerMoving = true;
+        //    //std::cout << " ->";
+        //}
+        //if (IfKeyReleased(event, Keyboard::Key::Right)) {
+            //playerMoving = false;
+        //    //std::cout << " stop";
+        //}
+
+        if (event->is<Event::Closed>() || IfKeyPressed(event, Keyboard::Key::Escape)) {
+            // Automatically, call to ~HERO() and ~Sprite().
             window.close();
         }
     }
 }
-void init() {
-    skyTexture.loadFromFile("Assets/graphics/sky.png");
-    skySprite = new Sprite(skyTexture);
-
-    bgTexture.loadFromFile("Assets/graphics/bg.png");
-    bgSprite = new Sprite(bgTexture);
-
-    heroTexture.loadFromFile("Assets/graphics/hero.png");
-    heroSprite = new Sprite(heroTexture);
-    heroSprite->setPosition(Vector2f(viewSize.x / 2, viewSize.y / 2));
-    heroSprite->setOrigin(Vector2f((float)(heroTexture.getSize().x) / 2, (float)(heroTexture.getSize().y) / 2));
-
+void update(float dt) {
+    hero.Update(dt);
+    //if (playerMoving) {
+    //    heroSprite->move(Vector2f(50.0f * dt, 0.0f)); // 50.0f: Speed.
+    //}
 }
 void draw() {
     window.draw(*skySprite);
     window.draw(*bgSprite);
-    window.draw(*heroSprite);
+
+    window.draw(*hero.GetSprite());
 }
 int main() {
     /*
@@ -73,14 +95,19 @@ int main() {
     triangle.setFillColor(Color(128, 0, 128, 255)); //Red, Green, Blue, Alpha. Alpha 255: fully opaque.
     triangle.setPosition({ viewSize.x / 2, viewSize.y / 2 });
     */
-    init();
+    Clock clock;
+    window.setFramerateLimit(60);
 
+    init();
 
     while (window.isOpen()) {
         // Handle Keyboard Events
-        // Update Game Objects in the scene
-        //window.clear(Color::Red); // Fills the whole window.
         updateInput();
+        // Update Game Objects in the scene
+        Time dt = clock.restart();
+        //std::cout << "fps " << 1.0f / dt.asSeconds() << std::endl;
+        update(dt.asSeconds()/* * 10.0f*/); 
+        //window.clear(Color::Red); // Fills the whole window.
         // Render Game Objects
         /*
         window.draw(rect);
