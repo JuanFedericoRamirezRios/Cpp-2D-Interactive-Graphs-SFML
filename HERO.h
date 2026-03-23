@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // #pragma: Aspects of compilation. once: Include once, preventing multiple definitions.
 /*
 Standar C++ 17
 SFML-3.0.2
@@ -6,7 +6,10 @@ SFML-3.0.2
 
 #include "SFML/Graphics.hpp"
 #include <iostream>
+#include "CppSFMLutilities.h"
+
 using namespace sf;
+
 class HERO
 {
 private:
@@ -28,15 +31,13 @@ public:
 		delete(sprite);
 
 	};
-	void Init(std::string textureName, Vector2f position, float factorGravity) {
+	void Init(std::string texturePath, Vector2f position, float factorGravity) {
 		pos = position;
 		facG = factorGravity;
 
 		grounded = false; // Can be start from a high part and fall to init.
 
-		if (!texture.loadFromFile(textureName/*.c_str()*/))
-			std::cerr << "Warning: No found texture ";
-		sprite = new Sprite(texture);
+		sprite = SFML_FEDE::CreateSprite(texture, texturePath/*.c_str()*/);
 		sprite->setPosition(pos);
 		sprite->setOrigin(Vector2f((float)(texture.getSize().x) / 2, (float)(texture.getSize().y) / 2));
 

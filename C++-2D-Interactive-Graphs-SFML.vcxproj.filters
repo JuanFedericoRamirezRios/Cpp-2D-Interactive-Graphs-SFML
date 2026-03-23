@@ -23,5 +23,11 @@
     <ClInclude Include="HERO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ENEMY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CppSFMLutilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

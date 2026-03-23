@@ -24,6 +24,7 @@
     <ProjectGuid>{8a4a35b3-f99a-4a0a-8758-6d9fe0aba48b}</ProjectGuid>
     <RootNamespace>C2DInteractiveGraphsSFML</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Cpp-2D-Interactive-Graphs-SFML</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -132,6 +133,8 @@
     <ClCompile Include="source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CppSFMLutilities.h" />
+    <ClInclude Include="ENEMY.h" />
     <ClInclude Include="HERO.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
