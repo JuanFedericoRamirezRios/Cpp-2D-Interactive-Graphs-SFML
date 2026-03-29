@@ -8,6 +8,7 @@ SFML-3.0.2
 #include "CppSFMLutilities.h"
 #include "HERO.h"
 #include "ENEMY.h"
+#include "ROCKET.h"
 
 using namespace sf;
 
@@ -16,6 +17,8 @@ VideoMode vm(Vector2u((unsigned)viewSize.x, (unsigned)viewSize.y));
 RenderWindow window(vm, "Interactive App", Style::Default); // Default combines the ability to resize a window, close it, and add a title bar.
 
 void SpawnEnemy(); // Prototype: Definition later.
+void SpawnRocket();
+bool CheckCollision(const Sprite* sprite1, const Sprite* sprite2);
 
 Texture skyTexture;
 Sprite* skySprite;
@@ -28,6 +31,7 @@ Sprite* bgSprite;
 HERO hero;
 
 std::vector<ENEMY*> enemies;  // *: otherwise, the reference to the texture is lost and the texture won't display when the enemy is spawned
+std::vector<ROCKET*> rockets;
 float To/* = 0.0f*/; 
 float Dt = 1.125f; // Interval, in seconds, between spawn the enemies.
 float t;
@@ -45,6 +49,11 @@ void Init() {
     t = 0.0f;
     To = t;
     
+}
+void SpawnRocket() { // Shoot rocket.
+    ROCKET* rocket = new ROCKET();
+    rocket->Init("Assets/graphics/rocket.png", hero.GetSprite()->getPosition(), 400.0f);
+    rockets.push_back(rocket);
 }
 void SpawnEnemy() {
     int rnd = rand() % 3; // rand() -> int from 0 to 0x7fff (15 bits). rand() % 3: Random of 0, 1 , 2.
@@ -71,11 +80,31 @@ void SpawnEnemy() {
     enemy->Init("Assets/graphics/enemy.png", pos, Vx);
     enemies.push_back(enemy);
 }
+bool CheckCollision(const Sprite* sprite1, const Sprite* sprite2) {
+    FloatRect rect1 = sprite1->getGlobalBounds(); // GlobalBounds is a rectangular region.
+    FloatRect rect2 = sprite2->getGlobalBounds();
+    if (rect1.findIntersection(rect2))
+        return true;
+    else return false;
+}
 void UpdateInput() {
     std::optional<Event> event;
     while (event = window.pollEvent()) {
-        if (SFML_FEDE::IfKeyPressed(event, Keyboard::Key::Up))
-            hero.Jump(-750.0f);
+        /*if (SFML_FEDE::IfKeyPressed(event, Keyboard::Key::Up))
+            hero.Jump(-750.0f);*/
+
+        // Game events:
+        if (event->is<Event::KeyPressed>()) {
+            Keyboard::Key key = event->getIf<Event::KeyPressed>()->code;
+            if (event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Up)
+                hero.Jump(-750.0f);
+            if (event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Down)
+                SpawnRocket();
+                
+        }
+        if (event->is<Event::KeyReleased>()) {
+
+        }
         //if (SFML_FEDE::IfKeyPressed(event, Keyboard::Key::Right)) {
         //    playerMoving = true;
         //    //std::cout << " ->";
@@ -112,9 +141,29 @@ void Update(float dt) {
             //std::cout << "Enemies after erase: " << enemies.size() << std::endl;
         }
     }
+    // Update and clear rockets offscreen
+    for (int n = 0; n < rockets.size(); n++) {
+        ROCKET* rocket = rockets[n]; // Is it necessary???
+        rockets[n]->Update(dt);
+        if (rockets[n]->GetSprite()->getPosition().x > viewSize.x) {
+            rockets.erase(rockets.begin() + n);
+            delete(rocket); // Is it necessary???
+        }
+    }
+    //Check collision between ROCKETs and ENEMIEs
+    for (int n = 0; n < rockets.size(); n++) {
+        for (int m = 0; m < enemies.size(); m++) {
+            ROCKET* rocket = rockets[n];
+            ENEMY* enemy = enemies[m];
+            if (CheckCollision(rocket->GetSprite(), enemy->GetSprite())) {
+                rockets.erase(rockets.begin() + n);
+                delete(rocket);
+                enemies.erase(enemies.begin() + m);
+                delete(enemy);
 
-    
-
+            }
+        }
+    }
     //if (playerMoving) {
     //    heroSprite->move(Vector2f(50.0f * dt, 0.0f)); // 50.0f: Speed.
     //}
@@ -124,6 +173,9 @@ void Draw() {
     window.draw(*bgSprite);
     window.draw(*hero.GetSprite());
     for (ENEMY* n : enemies) {
+        window.draw(*n->GetSprite());
+    }
+    for (ROCKET* n : rockets) {
         window.draw(*n->GetSprite());
     }
 }

@@ -10,7 +10,7 @@ SFML-3.0.2
 
 using namespace sf;
 
-class ENEMY {
+class ROCKET {
 private:
 	Texture texture;
 	Sprite* sprite;
@@ -18,10 +18,10 @@ private:
 	float Vx;
 
 public:
-	ENEMY() {
+	ROCKET() {
 
 	}
-	~ENEMY() {
+	~ROCKET() {
 		delete(sprite);
 	}
 	void Init(std::string pathTexture, Vector2f position, float Vx) {

@@ -23,6 +23,7 @@ private:
 	float Yo = 768.0f * 0.75f; // 768 is the height of original window. 768*0.75: position of ground.
 	bool grounded; // when the player is on the ground can they start jumping
 public:
+	// HERO(); // Error
 	HERO() {
 
 	};

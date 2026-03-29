@@ -29,5 +29,8 @@
     <ClInclude Include="CppSFMLutilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ROCKET.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

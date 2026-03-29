@@ -136,6 +136,7 @@
     <ClInclude Include="CppSFMLutilities.h" />
     <ClInclude Include="ENEMY.h" />
     <ClInclude Include="HERO.h" />
+    <ClInclude Include="ROCKET.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
