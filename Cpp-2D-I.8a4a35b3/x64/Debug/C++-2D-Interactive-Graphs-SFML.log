@@ -1,2 +1,3 @@
 ﻿  source.cpp
+D:\pCloud\pCloud\GitHubRepositories\Cpp-2D-Interactive-Graphs-SFML\source.cpp(52,29): warning C4834: discarding return value of function with [[nodiscard]] attribute
   C++-2D-Interactive-Graphs-SFML.vcxproj -> D:\pCloud\pCloud\GitHubRepositories\Cpp-2D-Interactive-Graphs-SFML\x64\Debug\Cpp-2D-Interactive-Graphs-SFML.exe

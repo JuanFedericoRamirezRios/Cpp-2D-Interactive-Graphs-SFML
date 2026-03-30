@@ -40,11 +40,21 @@ float t;
 int score = 0;
 bool gameOver = true; // Start game when shoot key is pressed.
 
+Font headingFont;
+Text* headingText;
+
 void Init() {
 
     skySprite = SFML_FEDE::CreateSprite(skyTexture, "Assets/graphics/sky.png");
 
     bgSprite = SFML_FEDE::CreateSprite(bgTexture, "Assets/graphics/bg.png");
+
+    headingFont.openFromFile("Assets/fonts/SnackerComic.ttf");
+    headingText = new Text(headingFont, "Shoot to start", 84);
+    headingText->setFillColor(Color::Red);
+    FloatRect hb = headingText->getLocalBounds();
+    headingText->setOrigin(Vector2f(hb.size.x/2, hb.size.y/2));
+    headingText->setPosition(Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
 
     hero.Init("Assets/graphics/hero.png", Vector2f(viewSize.x * 0.25f, viewSize.y * 0.5f), 200.0f);
 
@@ -199,6 +209,8 @@ void Draw() {
     for (ROCKET* n : rockets) {
         window.draw(*n->GetSprite());
     }
+    if (gameOver)
+        window.draw(*headingText);
 }
 int main() {
     Clock clock;
