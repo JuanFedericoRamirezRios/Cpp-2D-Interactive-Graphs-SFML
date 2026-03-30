@@ -19,6 +19,7 @@ RenderWindow window(vm, "Interactive App", Style::Default); // Default combines 
 void SpawnEnemy(); // Prototype: Definition later.
 void SpawnRocket();
 bool CheckCollision(const Sprite* sprite1, const Sprite* sprite2);
+void Reset();
 
 Texture skyTexture;
 Sprite* skySprite;
@@ -32,9 +33,12 @@ HERO hero;
 
 std::vector<ENEMY*> enemies;  // *: otherwise, the reference to the texture is lost and the texture won't display when the enemy is spawned
 std::vector<ROCKET*> rockets;
-float To/* = 0.0f*/; 
+float To; 
 float Dt = 1.125f; // Interval, in seconds, between spawn the enemies.
 float t;
+
+int score = 0;
+bool gameOver = true; // Start game when shoot key is pressed.
 
 void Init() {
 
@@ -87,19 +91,34 @@ bool CheckCollision(const Sprite* sprite1, const Sprite* sprite2) {
         return true;
     else return false;
 }
+void Reset() {
+    score = 0;
+    t = 0.0f;
+    To = 0.0f;
+    for (ENEMY* n : enemies) { // Freeing memory
+        delete(n);
+    }
+    for (ROCKET* n : rockets) {
+        delete(n);;
+    }
+    enemies.clear(); //Clear because that were holding the references.
+    rockets.clear();
+}
 void UpdateInput() {
     std::optional<Event> event;
     while (event = window.pollEvent()) {
-        /*if (SFML_FEDE::IfKeyPressed(event, Keyboard::Key::Up))
-            hero.Jump(-750.0f);*/
-
         // Game events:
         if (event->is<Event::KeyPressed>()) {
             Keyboard::Key key = event->getIf<Event::KeyPressed>()->code;
             if (event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Up)
                 hero.Jump(-750.0f);
-            if (event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Down)
-                SpawnRocket();
+            if (event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Down) {
+                if (gameOver) { // Start game when shoot key is pressed.
+                    gameOver = false;
+                    Reset();
+                } else
+                    SpawnRocket();
+            }
                 
         }
         if (event->is<Event::KeyReleased>()) {
@@ -115,7 +134,7 @@ void UpdateInput() {
         //}
 
         if (event->is<Event::Closed>() || SFML_FEDE::IfKeyPressed(event, Keyboard::Key::Escape)) {
-            // Automatically, call to ~HERO() and ~Sprite().
+            // Automatically, call to ~HERO() and ~Sprite()?
             window.close();
         }
     }
@@ -132,13 +151,14 @@ void Update(float dt) {
 
     // Update and clear enemies offscreen
     for (int n = 0; n < enemies.size(); n++) {
-        ENEMY* enemy = enemies[n]; // Is it necessary???
+        ENEMY* enemy = enemies[n];
         enemies[n]->Update(dt);
         if (enemies[n]->GetSprite()->getPosition().x < 0) {
             //std::cout << "Enemies before erase: " << enemies.size() << std::endl;
             enemies.erase(enemies.begin() + n);
-            delete(enemy); // Is it necessary???
+            delete(enemy);
             //std::cout << "Enemies after erase: " << enemies.size() << std::endl;
+            gameOver = true;
         }
     }
     // Update and clear rockets offscreen
@@ -156,11 +176,12 @@ void Update(float dt) {
             ROCKET* rocket = rockets[n];
             ENEMY* enemy = enemies[m];
             if (CheckCollision(rocket->GetSprite(), enemy->GetSprite())) {
+                score++;
+                std::cout << score << std::endl;
                 rockets.erase(rockets.begin() + n);
                 delete(rocket);
                 enemies.erase(enemies.begin() + m);
                 delete(enemy);
-
             }
         }
     }
@@ -212,8 +233,9 @@ int main() {
         UpdateInput();
         // Update Game Objects in the scene
         Time dt = clock.restart();
-        Update(dt.asSeconds()); 
-        //window.clear(Color::Red); // Fills the whole window.
+        if(!gameOver)
+            Update(dt.asSeconds()); 
+        // window.clear(Color::Red); // Fills the whole window.
         // Render Game Objects
         /*
         window.draw(rect);
