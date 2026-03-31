@@ -25,9 +25,16 @@ public:
 		//return std::make_unique<Sprite>(skyTexture);
 		return new Sprite(texture);
 	}
-	static Text* CreateText(Font& font, std::string pathFont, std::string text = "", unsigned charSize = 30) {
+	static Text* CreateText(Font& font, std::string pathFont, std::string str = "", unsigned charSize = 30, Color color = Color::Black) {
 		if (!font.openFromFile(pathFont))
 			std::cerr << "Warning: No found font file " << std::endl;
-		return new Text(font, text, charSize);
+		Text* text = new Text(font, str, charSize);
+		text->setFillColor(color);
+		return text;
+	}
+	static void SetPositionText(Text* text, Vector2f newPosition) { // Using when change de size (i.e. change the string).
+		FloatRect hb = text->getLocalBounds();
+		text->setOrigin(Vector2f(hb.size.x / 2, hb.size.y / 2));
+		text->setPosition(newPosition);
 	}
 };

@@ -21,18 +21,17 @@ void SpawnRocket();
 bool CheckCollision(const Sprite* sprite1, const Sprite* sprite2);
 void Reset();
 
-Texture skyTexture;
+Texture skyTexture; // It must be local, It has to be alive.
 Sprite* skySprite;
-
 Texture bgTexture;
 Sprite* bgSprite;
 
 //Vector2f playerPosition;
 //bool playerMoving = false;
 HERO hero;
-
 std::vector<ENEMY*> enemies;  // *: otherwise, the reference to the texture is lost and the texture won't display when the enemy is spawned
 std::vector<ROCKET*> rockets;
+
 float To; 
 float Dt = 1.125f; // Interval, in seconds, between spawn the enemies.
 float t;
@@ -40,21 +39,22 @@ float t;
 int score = 0;
 bool gameOver = true; // Start game when shoot key is pressed.
 
-Font headingFont;
+Font headingFont; // It must be local, It has to be alive.
 Text* headingText;
+
+Font scoreFont;
+Text* scoreText;
 
 void Init() {
 
     skySprite = SFML_FEDE::CreateSprite(skyTexture, "Assets/graphics/sky.png");
-
     bgSprite = SFML_FEDE::CreateSprite(bgTexture, "Assets/graphics/bg.png");
 
-    headingText = SFML_FEDE::CreateText(headingFont, "Assets/fonts/SnackerComic.ttf", "Shoot to start", 84);
-    
-    headingText->setFillColor(Color::Red);
-    FloatRect hb = headingText->getLocalBounds();
-    headingText->setOrigin(Vector2f(hb.size.x/2, hb.size.y/2));
-    headingText->setPosition(Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
+    headingText = SFML_FEDE::CreateText(headingFont, "Assets/fonts/SnackerComic.ttf", "Shoot to start", 84, Color::Red);
+    SFML_FEDE::SetPositionText(headingText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
+
+    scoreText = SFML_FEDE::CreateText(scoreFont, "Assets/fonts/arial.ttf", "Score: 0", 45);
+    SFML_FEDE::SetPositionText(scoreText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
 
     hero.Init("Assets/graphics/hero.png", Vector2f(viewSize.x * 0.25f, viewSize.y * 0.5f), 200.0f);
 
@@ -103,6 +103,8 @@ bool CheckCollision(const Sprite* sprite1, const Sprite* sprite2) {
 }
 void Reset() {
     score = 0;
+    scoreText->setString("Score: 0");
+
     t = 0.0f;
     To = 0.0f;
     for (ENEMY* n : enemies) { // Freeing memory
@@ -187,7 +189,9 @@ void Update(float dt) {
             ENEMY* enemy = enemies[m];
             if (CheckCollision(rocket->GetSprite(), enemy->GetSprite())) {
                 score++;
-                std::cout << score << std::endl;
+                scoreText->setString("Score: " + std::to_string(score));
+                SFML_FEDE::SetPositionText(scoreText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
+
                 rockets.erase(rockets.begin() + n);
                 delete(rocket);
                 enemies.erase(enemies.begin() + m);
@@ -211,6 +215,8 @@ void Draw() {
     }
     if (gameOver)
         window.draw(*headingText);
+    else
+        window.draw(*scoreText);
 }
 int main() {
     Clock clock;
