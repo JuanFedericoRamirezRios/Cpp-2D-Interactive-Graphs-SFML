@@ -49,8 +49,8 @@ void Init() {
 
     bgSprite = SFML_FEDE::CreateSprite(bgTexture, "Assets/graphics/bg.png");
 
-    headingFont.openFromFile("Assets/fonts/SnackerComic.ttf");
-    headingText = new Text(headingFont, "Shoot to start", 84);
+    headingText = SFML_FEDE::CreateText(headingFont, "Assets/fonts/SnackerComic.ttf", "Shoot to start", 84);
+    
     headingText->setFillColor(Color::Red);
     FloatRect hb = headingText->getLocalBounds();
     headingText->setOrigin(Vector2f(hb.size.x/2, hb.size.y/2));

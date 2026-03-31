@@ -21,8 +21,13 @@ public:
 	}
 	static Sprite* CreateSprite(Texture& texture, std::string pathTexture) {
 		if (!texture.loadFromFile(pathTexture))
-			std::cerr << "Warning: No found texture " << std::endl;
+			std::cerr << "Warning: No found texture file " << std::endl;
 		//return std::make_unique<Sprite>(skyTexture);
 		return new Sprite(texture);
+	}
+	static Text* CreateText(Font& font, std::string pathFont, std::string text = "", unsigned charSize = 30) {
+		if (!font.openFromFile(pathFont))
+			std::cerr << "Warning: No found font file " << std::endl;
+		return new Text(font, text, charSize);
 	}
 };
