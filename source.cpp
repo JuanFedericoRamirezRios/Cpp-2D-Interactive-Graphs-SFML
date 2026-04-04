@@ -4,6 +4,7 @@ SFML-3.0.2
 */
 
 #include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 #include <iostream>
 #include "CppSFMLutilities.h"
 #include "HERO.h"
@@ -45,18 +46,37 @@ Text* headingText;
 Font scoreFont;
 Text* scoreText;
 
+Text* tutorialText;
+
+Music bgMusic;
+
+SoundBuffer fireBuffer;
+Sound* fireSound;
+SoundBuffer hitBuffer;
+Sound* hitSound;
+
 void Init() {
 
     skySprite = SFML_FEDE::CreateSprite(skyTexture, "Assets/graphics/sky.png");
     bgSprite = SFML_FEDE::CreateSprite(bgTexture, "Assets/graphics/bg.png");
 
-    headingText = SFML_FEDE::CreateText(headingFont, "Assets/fonts/SnackerComic.ttf", "Shoot to start", 84, Color::Red);
+    headingText = SFML_FEDE::CreateText(headingFont, "Assets/fonts/SnackerComic.ttf", "Demo game", 84, Color::Red);
     SFML_FEDE::SetPositionText(headingText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
 
-    scoreText = SFML_FEDE::CreateText(scoreFont, "Assets/fonts/arial.ttf", "Score: 0", 45);
+    tutorialText = SFML_FEDE::CreateText(scoreFont, "Assets/fonts/arial.ttf", "Press Down Arrow to Fire and Start Game, Up Arrow to Jump", 35, Color::Red);
+    SFML_FEDE::SetPositionText(tutorialText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.2f));
+
+    scoreText = SFML_FEDE::CreateText(scoreFont, "Score: 0", 45);
     SFML_FEDE::SetPositionText(scoreText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
 
-    hero.Init("Assets/graphics/hero.png", Vector2f(viewSize.x * 0.25f, viewSize.y * 0.5f), 200.0f);
+    if (!bgMusic.openFromFile("Assets/audio/bgMusic.ogg"))
+        std::cerr << "Warning: No found sound file " << std::endl;
+    bgMusic.play();
+
+    fireSound = SFML_FEDE::CreateSound(fireBuffer, "Assets/audio/fire.ogg");
+    hitSound = SFML_FEDE::CreateSound(hitBuffer, "Assets/audio/hit.ogg");
+
+    hero.Init("Assets/graphics/heroAnim.png", Vector2i(92,126), 4, 1.0f, Vector2f(viewSize.x * 0.25f, viewSize.y * 0.5f), 200.0f); // Size of each Sprite (pixels) = 368x126. 368 / 4 = 92
 
     srand((unsigned)time(0)); // Seed of rand.
 
@@ -68,6 +88,7 @@ void SpawnRocket() { // Shoot rocket.
     ROCKET* rocket = new ROCKET();
     rocket->Init("Assets/graphics/rocket.png", hero.GetSprite()->getPosition(), 400.0f);
     rockets.push_back(rocket);
+    fireSound->play();
 }
 void SpawnEnemy() {
     int rnd = rand() % 3; // rand() -> int from 0 to 0x7fff (15 bits). rand() % 3: Random of 0, 1 , 2.
@@ -188,6 +209,7 @@ void Update(float dt) {
             ROCKET* rocket = rockets[n];
             ENEMY* enemy = enemies[m];
             if (CheckCollision(rocket->GetSprite(), enemy->GetSprite())) {
+                hitSound->play();
                 score++;
                 scoreText->setString("Score: " + std::to_string(score));
                 SFML_FEDE::SetPositionText(scoreText, Vector2f(viewSize.x * 0.5f, viewSize.y * 0.1f));
@@ -213,8 +235,10 @@ void Draw() {
     for (ROCKET* n : rockets) {
         window.draw(*n->GetSprite());
     }
-    if (gameOver)
+    if (gameOver) {
         window.draw(*headingText);
+        window.draw(*tutorialText);
+    }
     else
         window.draw(*scoreText);
 }

@@ -32,9 +32,20 @@ public:
 		text->setFillColor(color);
 		return text;
 	}
+	static Text* CreateText(Font& font, std::string str = "", unsigned charSize = 30, Color color = Color::Black) {
+		Text* text = new Text(font, str, charSize);
+		text->setFillColor(color);
+		return text;
+	}
 	static void SetPositionText(Text* text, Vector2f newPosition) { // Using when change de size (i.e. change the string).
 		FloatRect hb = text->getLocalBounds();
 		text->setOrigin(Vector2f(hb.size.x / 2, hb.size.y / 2));
 		text->setPosition(newPosition);
+	}
+	static Sound* CreateSound(SoundBuffer& buffer, std::string pathSound) {
+		if (!buffer.loadFromFile(pathSound))
+			std::cerr << "Warning: No found sound file" << std::endl;
+		//return std::make_unique<Sprite>(skyTexture);
+		return new Sound(buffer);
 	}
 };
