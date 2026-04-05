@@ -277,7 +277,7 @@ int main() {
         Time dt = clock.restart();
         if(!gameOver)
             Update(dt.asSeconds()); 
-        // window.clear(Color::Red); // Fills the whole window.
+        window.clear(Color::Red); // It must be called once every frame.
         // Render Game Objects
         /*
         window.draw(rect);
