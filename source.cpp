@@ -1,5 +1,5 @@
 /*
-Standar C++ 17
+Standar C++ 20
 SFML-3.0.2
 */
 

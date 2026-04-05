@@ -1,6 +1,6 @@
 #pragma once // #pragma: Aspects of compilation. once: Include once, preventing multiple definitions.
 /*
-Standar C++ 17
+Standar C++ 20
 SFML-3.0.2
 */
 
